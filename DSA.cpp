@@ -10,7 +10,7 @@ using namespace std;
 
 class Transaction {
 public:
-    string type;
+    string type; 
     string description;
     double amount;
 
@@ -26,9 +26,8 @@ private:
     stack<Transaction> undoStack;
     stack<Transaction> redoStack;
     queue<Transaction> transactionQueue;
-    priority_queue<Transaction> amountHeap; 
+    priority_queue<Transaction> amountHeap;
     unordered_map<string, double> typeMap; 
-
     void saveToFile() {
         ofstream file("transactions.txt");
         if (file.is_open()) {
@@ -105,7 +104,6 @@ public:
                 totalExpenses += amount;
             }
         }
-
         cout << "Total Income: $" << totalIncome << endl;
         cout << "Total Expenses: $" << totalExpenses << endl;
         cout << "Remaining Balance: $" << (totalIncome - totalExpenses) << endl;
@@ -115,9 +113,9 @@ public:
         if (!undoStack.empty()) {
             Transaction lastTransaction = undoStack.top();
             undoStack.pop();
-            transactions.pop_back(); 
+            transactions.pop_back();
             typeMap[lastTransaction.type] -= lastTransaction.amount; 
-            redoStack.push(lastTransaction);
+            redoStack.push(lastTransaction); 
         } else {
             cout << "Nothing to undo." << endl;
         }
@@ -127,7 +125,7 @@ public:
         if (!redoStack.empty()) {
             Transaction lastUndoneTransaction = redoStack.top();
             redoStack.pop();
-            transactions.push_back(lastUndoneTransaction);
+            transactions.push_back(lastUndoneTransaction); 
             typeMap[lastUndoneTransaction.type] += lastUndoneTransaction.amount; 
             undoStack.push(lastUndoneTransaction); 
         } else {
@@ -255,7 +253,7 @@ int main() {
         } else if (choice == 11) {
             tracker.sortByDescription();
             cout << "Transactions sorted by description." << endl;
-        } else if (choice == 12){
+        } else if (choice == 12) {
             string description;
             cout << "Enter description to search for: ";
             getline(cin, description);
