@@ -2,7 +2,6 @@
 #include <vector>
 #include <fstream>
 #include <string>
-#include <iomanip>
 #include <stack>
 #include <queue>
 #include <algorithm>
@@ -11,13 +10,11 @@ using namespace std;
 
 class Transaction {
 public:
-    string type; // "Income" or "Expense"
+    string type;
     string description;
     double amount;
 
     Transaction(const string& t, const string& d, double a) : type(t), description(d), amount(a) {}
-
-    // For priority queue (heap) comparison
     bool operator<(const Transaction& other) const {
         return amount < other.amount;
     }
@@ -29,8 +26,8 @@ private:
     stack<Transaction> undoStack;
     stack<Transaction> redoStack;
     queue<Transaction> transactionQueue;
-    priority_queue<Transaction> amountHeap; // Max-heap for transactions by amount
-    unordered_map<string, double> typeMap; // Map to categorize transactions by type
+    priority_queue<Transaction> amountHeap; 
+    unordered_map<string, double> typeMap; 
 
     void saveToFile() {
         ofstream file("transactions.txt");
@@ -59,7 +56,7 @@ private:
                 amount = stod(line.substr(pos2 + 1));
 
                 transactions.emplace_back(type, description, amount);
-                typeMap[type] += amount; // Update map with transaction type and amount
+                typeMap[type] += amount; 
             }
             file.close();
         } else {
@@ -70,7 +67,6 @@ private:
 public:
     BudgetTracker() {
         loadFromFile();
-        // Initialize the heap with current transactions
         for (const auto& transaction : transactions) {
             amountHeap.push(transaction);
         }
@@ -85,15 +81,14 @@ public:
         transactions.push_back(newTransaction);
         transactionQueue.push(newTransaction);
         undoStack.push(newTransaction);
-        typeMap[type] += amount; // Update map with transaction type and amount
-        amountHeap.push(newTransaction); // Update heap with new transaction
+        typeMap[type] += amount; 
+        amountHeap.push(newTransaction); 
         while (!redoStack.empty()) {
             redoStack.pop();
         }
     }
 
     void viewTransactions() {
-        cout << fixed << setprecision(2);
         for (const auto& transaction : transactions) {
             cout << transaction.type << ": " << transaction.description << " - $" << transaction.amount << endl;
         }
@@ -110,7 +105,7 @@ public:
                 totalExpenses += amount;
             }
         }
-        cout << fixed << setprecision(2);
+
         cout << "Total Income: $" << totalIncome << endl;
         cout << "Total Expenses: $" << totalExpenses << endl;
         cout << "Remaining Balance: $" << (totalIncome - totalExpenses) << endl;
@@ -120,9 +115,9 @@ public:
         if (!undoStack.empty()) {
             Transaction lastTransaction = undoStack.top();
             undoStack.pop();
-            transactions.pop_back(); // Remove the last transaction
-            typeMap[lastTransaction.type] -= lastTransaction.amount; // Update map
-            redoStack.push(lastTransaction); // Add to redo stack
+            transactions.pop_back(); 
+            typeMap[lastTransaction.type] -= lastTransaction.amount; 
+            redoStack.push(lastTransaction);
         } else {
             cout << "Nothing to undo." << endl;
         }
@@ -132,9 +127,9 @@ public:
         if (!redoStack.empty()) {
             Transaction lastUndoneTransaction = redoStack.top();
             redoStack.pop();
-            transactions.push_back(lastUndoneTransaction); // Re-add to transactions
-            typeMap[lastUndoneTransaction.type] += lastUndoneTransaction.amount; // Update map
-            undoStack.push(lastUndoneTransaction); // Add back to undo stack
+            transactions.push_back(lastUndoneTransaction);
+            typeMap[lastUndoneTransaction.type] += lastUndoneTransaction.amount; 
+            undoStack.push(lastUndoneTransaction); 
         } else {
             cout << "Nothing to redo." << endl;
         }
@@ -144,7 +139,6 @@ public:
         while (!transactionQueue.empty()) {
             Transaction t = transactionQueue.front();
             transactionQueue.pop();
-            // Process the transaction (for now, just print it)
             cout << "Processing transaction: " << t.type << ": " << t.description << " - $" << t.amount << endl;
         }
     }
@@ -163,8 +157,6 @@ public:
             cout << "No transactions to display." << endl;
             return;
         }
-
-        // Finding the lowest transaction by iterating through transactions
         auto minIt = min_element(transactions.begin(), transactions.end(), [](const Transaction& a, const Transaction& b) {
             return a.amount < b.amount;
         });
@@ -263,18 +255,16 @@ int main() {
         } else if (choice == 11) {
             tracker.sortByDescription();
             cout << "Transactions sorted by description." << endl;
-        } else if (choice == 12) {
-            string desc;
-            cout << "Enter description to search: ";
-            getline(cin, desc);
-            tracker.searchByDescription(desc);
+        } else if (choice == 12){
+            string description;
+            cout << "Enter description to search for: ";
+            getline(cin, description);
+            tracker.searchByDescription(description);
         } else if (choice == 13) {
             double amount;
-            cout << "Enter amount to search: ";
+            cout << "Enter amount to search for: ";
             cin >> amount;
             tracker.searchByAmount(amount);
-        } else if (choice != 14) {
-            cout << "Invalid choice. Please try again." << endl;
         }
     } while (choice != 14);
 
